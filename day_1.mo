@@ -1,4 +1,5 @@
 import Array "mo:base/Array";
+import Buffer "mo:base/Buffer";
 import Nat "mo:base/Nat";
 
 actor {
@@ -86,9 +87,42 @@ actor {
     };
     return new_array;
   };
+  /*Buffer version
+  public func remove_from_array(n : [Nat], m : Nat) : async [Nat] {
+    let new_array : Buffer.Buffer<Nat> = Buffer.Buffer(0);
+    for (n in n.vals()){
+      if(n != m) {
+        new_array.add(n);
+      };
+    };
+    return new_array.toArray();
+  };
+  */
 
-  //10
+  /*10
   public func selection_sort(nums : [Nat]) : async [Nat] {
     return Array.sort(nums, Nat.compare);
   };
+
+  //10 alternative
+  public func selectionSort(array : [Nat]) : async [Nat] {
+        var toMutable : [var Nat] = Array.thaw<Nat>(array : [Nat]);
+        let size = array.size();
+
+        for(i in Iter.range(0, size - 1)){
+            var min = i;
+            for(j in Iter.range(i, size - 1)) {
+                if(toMutable[min] > toMutable[j]) {
+                    min := j;
+                };
+            };
+            if(min != i) {
+                let temp = toMutable[i];
+                toMutable[i] := toMutable[min];
+                toMutable[min] := temp;
+            }
+        };
+        return(Array.freeze<Nat>(toMutable : [var Nat]));
+    };
+  */
 };
