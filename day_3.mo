@@ -1,33 +1,59 @@
 import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
+import Iter "mo:base/Iter";
 import Nat "mo:base/Nat";
 
 actor {
   //1
-  private func swap(ar : [var Nat], j : Nat, i : Nat) : async [Nat] {
-    var new_array : Buffer.Buffer<Nat> = Buffer.Buffer(0);
-    for (ar in ar.vals()){
-      if (j == i){
-        new_array.add(ar);
-      } else if (j < i){
-        new_array.add(ar);
-      } else {
-        new_array.add(ar);
-      };
-    };
-    return new_array.toArray();
+  // private func swap(ar : [var Nat], j : Nat, i : Nat) : async [Nat] {
+  //   var new_array : Buffer.Buffer<Nat> = Buffer.Buffer(0);
+  //   for (ar in ar.vals()){
+  //     if (j == i){
+  //       new_array.add(ar);
+  //     } else if (j < i){
+  //       new_array.add(ar);
+  //     } else {
+  //       new_array.add(ar);
+  //     };
+  //   };
+  //   return new_array.toArray();
+  // };
+  private func swap(array : [Nat],i : Nat, j : Nat) : async [Nat] {
+    let mutableArray = Array.thaw<Nat>(array : [Nat]);
+    mutableArray[i] := array[j];
+    mutableArray[j] := array[i];
+    return Array.freeze<Nat>(mutableArray);
   };
 
   //2 init_count
+  public func init_count(n : Nat) : async [Nat] {
+    var array : Buffer.Buffer<Nat> = Buffer.Buffer(0);
+    for (n in Iter.range(0, n)){
+      array.add(n);
+    };
+    return array.toArray();
+  };
 
   //3
-  public func seven(n : [Nat]) : async Text {
-    var i : Nat = n[0];
-    if(i%7 == 0){
-      return "Seven is found";
-    } else {
-      return "Seven not found";
+  // public func seven(n : [Nat]) : async Text {
+  //   var i : Nat = n[0];
+  //   if(i%7 == 0){
+  //     return "Seven is found";
+  //   } else {
+  //     return "Seven not found";
+  //   };
+  // };
+  public func seven(array : [Nat]) : async Text {
+    let arrayText : [Text] = Array.map<Nat, Text>(array : [Nat], Nat.toText);
+    let seven : Char = '7';
+    for(number in arrayText.vals()){
+      for(char in number.chars()){
+        if(char == seven){
+          return "Seven is found";
+        };
+      };
     };
+    return "Seven not found";
   };
 
   //4
@@ -66,35 +92,42 @@ actor {
       case(?7) {
         return "Sunday";
       };
-      case(n) {
+      case(_) {
         return "null";
       };
     };
   };
 
   //6 populate_array
+  public func populate_array(array : [?Nat]) : async [Nat] {
+    Array.map<?Nat,Nat>(array : [?Nat], func(x) {
+      switch(x){
+        case(?x) {
+          return x;
+        };
+        case(null) {
+          return 0;
+        };
+      };
+    });
+  };
 
   //7 sum_of_array
+  public func sum_of_array(array : [Nat]) : async Nat {
+    let sum = Array.foldLeft<Nat, Nat>(array : [Nat], 0, func(a, b) {a + b});
+    return sum;
+  };
 
   //8
   public func squared_array(ar : [Nat]) : async [Nat] {
-    let square = func (n : Nat) : Nat {
-      return n*n;
-    };
-    let new_array = Array.map(ar, square);
-    return new_array;
+    let square = Array.map<Nat, Nat>(ar : [Nat], func(x) {x * x});
   };
   
   //9
   public func increase_by_index(ar : [Nat]) :async [Nat] {
-    let increase = func (n : Nat, i : Nat) : Nat {
-      return n+i;
-    };
-    let new_array = Array.mapEntries(ar, increase);
-    return new_array;
+    return Array.mapEntries<Nat, Nat>(ar : [Nat], func(x, i) {x + i});
   };
 
   //10 contains<A>
-
 
 };
